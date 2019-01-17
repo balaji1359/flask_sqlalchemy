@@ -23,7 +23,7 @@ class Employee(SQLAlchemyObjectType):
         interfaces = (relay.Node, )
 
 
-class EmployeeConnection(relay.Connection):
+class EmployeeConnections(relay.Connection):
     class Meta:
         node = Employee
 
