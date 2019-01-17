@@ -25,10 +25,23 @@ class EmployeeConnection(relay.Connection):
     class Meta:
         node = EmployeeNode
 
+        
+        
+class Role(SQLAlchemyObjectType):
+    class Meta:
+        model = RoleModel
+        interfaces = (relay.Node, )
+
+
+class RoleConnection(relay.Connection):
+    class Meta:
+        node = Role
+
 
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
     all_employees = SQLAlchemyConnectionField(EmployeeConnection)
+    all_roles = SQLAlchemyConnectionField(RoleConnection)
     all_departments = SQLAlchemyConnectionField(DepartmentConnection, sort=None)
 
 
