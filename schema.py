@@ -1,60 +1,35 @@
 import graphene
 from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType, utils
-from models import Department as DepartmentModel
-from models import Employee as EmployeeModel
-from models import Role as RoleModel
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from models import Department, Employee
 
 
-class Department(SQLAlchemyObjectType):
+class DepartmentNode(SQLAlchemyObjectType):
     class Meta:
-        model = DepartmentModel
-        interfaces = (relay.Node, )
+        model = Department
+        interfaces = (relay.Node,)
 
 
 class DepartmentConnection(relay.Connection):
     class Meta:
-        node = Department
+        node = DepartmentNode
 
 
-class Employee(SQLAlchemyObjectType):
+class EmployeeNode(SQLAlchemyObjectType):
     class Meta:
-        model = EmployeeModel
-        interfaces = (relay.Node, )
+        model = Employee
+        interfaces = (relay.Node,)
 
 
-class EmployeeConnections(relay.Connection):
+class EmployeeConnection(relay.Connection):
     class Meta:
-        node = Employee
-
-
-class Role(SQLAlchemyObjectType):
-    class Meta:
-        model = RoleModel
-        interfaces = (relay.Node, )
-
-
-class RoleConnection(relay.Connection):
-    class Meta:
-        node = Role
-
-
-SortEnumEmployee = utils.sort_enum_for_model(EmployeeModel, 'SortEnumEmployee',
-    lambda c, d: c.upper() + ('_ASC' if d else '_DESC'))
+        node = EmployeeNode
 
 
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
-    # Allow only single column sorting
-    all_employees = SQLAlchemyConnectionField(
-        EmployeeConnection,
-        sort=graphene.Argument(
-            SortEnumEmployee,
-            default_value=utils.EnumValue('id_asc', EmployeeModel.id.asc())))
-    # Allows sorting over multiple columns, by default over the primary key
-    all_roles = SQLAlchemyConnectionField(RoleConnection)
-    # Disable sorting over this field
+    all_employees = SQLAlchemyConnectionField(EmployeeConnection)
     all_departments = SQLAlchemyConnectionField(DepartmentConnection, sort=None)
 
 
-schema = graphene.Schema(query=Query, types=[Department, Employee, Role])
+schema = graphene.Schema(query=Query)
